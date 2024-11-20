@@ -17,8 +17,20 @@ const authController = {
             }
 
             const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: '1h' });
-            res.status(200).json({ token, user: { id: user.id, name: user.name, email: user.email, number: user.number, address: user.address, gender: user.gender, role: user.role } });
+            res.status(200).json({ 
+                token, 
+                user: { 
+                    id: user.id, 
+                    name: user.name, 
+                    email: user.email, 
+                    number: user.number, 
+                    address: user.address, 
+                    gender: user.gender, 
+                    role: user.role 
+                } 
+            });
         } catch (error) {
+            console.error('Error during login:', error);
             res.status(500).json({ message: 'Server error', error });
         }
     },

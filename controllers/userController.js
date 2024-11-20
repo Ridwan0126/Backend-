@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const fs = require('fs');
+const path = require('path');
 
 const userController = {
     getProfile: async (req, res) => {
@@ -10,17 +12,6 @@ const userController = {
 
             const genderConverted = user.gender === 'Laki-laki' ? 'male' : 'female';
 
-            console.log("Data yang dikirim ke frontend:", {
-                firstName: user.name.split(' ')[0],
-                lastName: user.name.split(' ').slice(1).join(' '),
-                email: user.email,
-                phone: user.number,
-                address: user.address,
-                gender: genderConverted,
-                role: user.role,
-                profileImage: user.profile_image
-            });
-
             res.json({
                 firstName: user.name.split(' ')[0],
                 lastName: user.name.split(' ').slice(1).join(' '),
@@ -29,7 +20,7 @@ const userController = {
                 address: user.address,
                 gender: genderConverted,
                 role: user.role,
-                profileImage: user.profile_image || ''
+                profileImage: user.profile_image || '/Avatar.svg'
             });
         } catch (error) {
             console.error('Error fetching profile:', error);
@@ -40,7 +31,6 @@ const userController = {
     updateProfile: async (req, res) => {
         try {
             const { firstName, lastName, email, phone, address, gender, profileImage } = req.body;
-
             const genderInDb = gender === 'male' ? 'Laki-laki' : 'Perempuan';
             const fullName = `${firstName} ${lastName}`;
 
@@ -75,6 +65,63 @@ const userController = {
         }
     },
 
+    uploadProfileImage: async (req, res) => {
+        try {
+            const userId = req.userId;
+            const profileImagePath = `/uploads/profile_pictures/${req.file.filename}`;
+            const user = await User.findById(userId);
+
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            const result = await User.updateById(userId, {
+                profile_image: profileImagePath,
+                name: user.name,
+                email: user.email,
+                number: user.number,
+                address: user.address,
+                role: user.role,
+                status: user.status
+            });
+
+            res.json({
+                message: 'Profile image uploaded successfully',
+                profileImage: profileImagePath
+            });
+        } catch (error) {
+            console.error('Error uploading profile image:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
+    deleteProfileImage: async (req, res) => {
+        try {
+            const user = await User.findById(req.userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            if (user.profile_image && user.profile_image !== '/Avatar.svg') {
+                const imagePath = path.join(__dirname, '..', user.profile_image);
+                fs.unlink(imagePath, (err) => {
+                    if (err) {
+                        console.error('Failed to delete image file:', err);
+                    }
+                });
+            }
+
+            const result = await User.updateById(req.userId, {
+                profile_image: null
+            });
+
+            res.json({ message: 'Profile image deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting profile image:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
     getAdmins: async (req, res) => {
         try {
             const admins = await User.findByRole('Admin');
@@ -88,9 +135,7 @@ const userController = {
     addAdmin: async (req, res) => {
         try {
             const { name, email, number, address, role, status } = req.body;
-
             const newAdmin = { name, email, number, address, role, status };
-
             const result = await User.create(newAdmin);
             res.status(201).json(result);
         } catch (error) {
@@ -103,7 +148,6 @@ const userController = {
         try {
             const { id } = req.params;
             const result = await User.deleteById(id);
-
             if (result.affectedRows > 0) {
                 res.json({ message: 'Admin berhasil dihapus' });
             } else {
@@ -115,13 +159,11 @@ const userController = {
         }
     },
 
-    updateAdmin: async (req, res) => { // Removed 'const' here
+    updateAdmin: async (req, res) => {
         try {
             const { id } = req.params;
             const { name, email, number, address, role, status } = req.body;
-
             const result = await User.updateById(id, { name, email, number, address, role, status });
-
             if (result.affectedRows > 0) {
                 res.json({ message: 'Admin updated successfully' });
             } else {
