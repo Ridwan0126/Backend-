@@ -1,6 +1,6 @@
 const path = require('path');
-const PointExchangeHistory = require('../models/PointExchangeHistory');
-
+const PointExchangeHistory = require('../../models/kuypoint/PointExchangeHistory');
+const generatePointID = require('../../helpers/generatePointID'); // Tambahkan import ini
 
 const pointExchangeController = {
     getAll: async (req, res) => {
@@ -14,13 +14,12 @@ const pointExchangeController = {
             res.status(500).json({ message: 'Error fetching data', error: error.message });
         }
     },
-    
 
     create: async (req, res) => {
         try {
             const newData = req.body;
 
-            const newID = await generateAutoID();
+            const newID = await generatePointID(); // Gunakan generatePointID
             const dataToInsert = {
                 id: newID,
                 ...newData
@@ -70,7 +69,6 @@ const pointExchangeController = {
     uploadReceipt: async (req, res) => {
         const { id } = req.params;
 
-        // Jika tidak ada file yang diunggah
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }

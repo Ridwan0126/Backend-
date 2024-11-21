@@ -1,7 +1,7 @@
 const express = require('express');
-const userController = require('../controllers/userController');
-const authMiddleware = require('../middlewares/authMiddleware'); 
-const { uploadProfilePicture } = require('../middlewares/uploadMiddleware'); // Import only uploadProfilePicture
+const userController = require('../../controllers/user/userController');
+const authMiddleware = require('../../middlewares/authMiddleware'); 
+const { uploadProfilePicture } = require('../../middlewares/uploadMiddleware'); // Import only uploadProfilePicture
 const router = express.Router();
 
 router.get('/profile', authMiddleware, userController.getProfile);

@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../../models/user/User');
 const fs = require('fs');
 const path = require('path');
 
@@ -97,11 +97,12 @@ const userController = {
 
     deleteProfileImage: async (req, res) => {
         try {
-            const user = await User.findById(req.userId);
+            const user = await User.findById(req.userId); // Ambil data user saat ini
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
-
+    
+            // Hapus file gambar jika ada
             if (user.profile_image && user.profile_image !== '/Avatar.svg') {
                 const imagePath = path.join(__dirname, '..', user.profile_image);
                 fs.unlink(imagePath, (err) => {
@@ -110,17 +111,24 @@ const userController = {
                     }
                 });
             }
-
+    
+            // Update profile_image menjadi null, tetapi jaga kolom lain agar tidak null
             const result = await User.updateById(req.userId, {
-                profile_image: null
+                profile_image: null,
+                name: user.name,         // Tetap gunakan nama saat ini
+                email: user.email,       // Tetap gunakan email saat ini
+                number: user.number,     // Tetap gunakan nomor saat ini
+                address: user.address,   // Tetap gunakan alamat saat ini
+                role: user.role,         // Tetap gunakan role saat ini
+                status: user.status      // Tetap gunakan status saat ini
             });
-
+    
             res.json({ message: 'Profile image deleted successfully' });
         } catch (error) {
             console.error('Error deleting profile image:', error);
             res.status(500).json({ message: 'Server error' });
         }
-    },
+    },    
 
     getAdmins: async (req, res) => {
         try {

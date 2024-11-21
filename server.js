@@ -1,9 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const pointExchangeRoutes = require('./routes/pointExchangeRoutes');
+const authRoutes = require('./routes/auth/authRoutes');
+const userRoutes = require('./routes/user/userRoutes');
+const pointExchangeRoutes = require('./routes/kuypoint/pointExchangeRoutes');
+const yukBuangRoutes = require('./routes/yukbuang/yukBuangRoutes');
+const yukAngkutRoutes = require('./routes/yukangkut/yukAngkutRoutes');
 const db = require('./config/db');
 const path = require('path');
 
@@ -15,9 +17,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes); 
 app.use('/api/point-exchange', pointExchangeRoutes);
+app.use('/api/yuk_buang', yukBuangRoutes);
+app.use('/api/yuk_angkut', yukAngkutRoutes);
 
-// Serve static files for profile pictures and receipts separately
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads/profile_pictures', express.static(path.join(__dirname, 'uploads/profile_pictures')));
+app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -1,0 +1,26 @@
+const db = require('../config/db');
+
+const generatePickupId = async () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const dateString = `${year}${month}${day}`;
+
+  try {
+    const [rows] = await db.query(
+      `SELECT COUNT(*) as count FROM yuk_angkut WHERE pickup_id LIKE ?`,
+      [`YK-${dateString}%`]
+    );
+
+    const count = rows[0]?.count + 1 || 1;
+    const countString = String(count).padStart(4, '0'); // Format angka menjadi 4 digit
+
+    return `YK-${dateString}-${countString}`;
+  } catch (error) {
+    console.error('Error generating pickup ID:', error);
+    throw new Error('Failed to generate pickup ID');
+  }
+};
+
+module.exports = generatePickupId;
