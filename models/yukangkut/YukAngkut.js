@@ -31,7 +31,7 @@ const YukAngkut = {
 
     findByPickupId: async (pickup_id) => {
         const [rows] = await db.query('SELECT * FROM yuk_angkut WHERE pickup_id = ?', [pickup_id]);
-        return rows[0]; // Mengembalikan satu baris data
+        return rows[0]; 
     }
 };
 

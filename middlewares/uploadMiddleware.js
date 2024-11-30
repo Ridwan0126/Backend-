@@ -12,11 +12,15 @@ const profilePictureStorage = multer.diskStorage({
 
 const receiptStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/receipts'); 
+        const uploadPath = 'uploads/receipts';
+        console.log('Saving file to:', uploadPath);
+        cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
+        const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+        console.log('Generated file name:', fileName); 
+        cb(null, fileName);
+    },
 });
 
 const fileFilter = (req, file, cb) => {
@@ -36,5 +40,7 @@ const uploadReceipt = multer({
     storage: receiptStorage, 
     fileFilter 
 });
+
+
 
 module.exports = { uploadProfilePicture, uploadReceipt };

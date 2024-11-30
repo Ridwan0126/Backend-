@@ -1,6 +1,6 @@
 const path = require('path');
 const PointExchangeHistory = require('../../models/kuypoint/PointExchangeHistory');
-const generatePointID = require('../../helpers/generatePointID'); // Tambahkan import ini
+const generatePointID = require('../../helpers/generatePointID'); 
 
 const pointExchangeController = {
     getAll: async (req, res) => {
@@ -72,21 +72,18 @@ const pointExchangeController = {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
-
         const fileUrl = `/uploads/receipts/${req.file.filename}`;
-
         try {
             const result = await PointExchangeHistory.updateById(id, { receipt: fileUrl });
-
             if (result.affectedRows > 0) {
-                res.json({ message: 'Receipt uploaded successfully', receipt: fileUrl });
+                res.json(fileUrl); 
             } else {
                 res.status(404).json({ message: 'Data not found' });
             }
         } catch (error) {
             console.error('Error uploading receipt:', error);
             res.status(500).json({ message: 'Error uploading receipt', error });
-        }
+        }        
     }
 };
 

@@ -14,7 +14,7 @@ const generatePickupId = async () => {
     );
 
     const count = rows[0]?.count + 1 || 1;
-    const countString = String(count).padStart(4, '0'); // Format angka menjadi 4 digit
+    const countString = String(count).padStart(4, '0'); 
 
     return `YK-${dateString}-${countString}`;
   } catch (error) {

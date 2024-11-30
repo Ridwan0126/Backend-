@@ -97,12 +97,11 @@ const userController = {
 
     deleteProfileImage: async (req, res) => {
         try {
-            const user = await User.findById(req.userId); // Ambil data user saat ini
+            const user = await User.findById(req.userId); 
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
-    
-            // Hapus file gambar jika ada
+
             if (user.profile_image && user.profile_image !== '/Avatar.svg') {
                 const imagePath = path.join(__dirname, '..', user.profile_image);
                 fs.unlink(imagePath, (err) => {
@@ -112,15 +111,14 @@ const userController = {
                 });
             }
     
-            // Update profile_image menjadi null, tetapi jaga kolom lain agar tidak null
             const result = await User.updateById(req.userId, {
                 profile_image: null,
-                name: user.name,         // Tetap gunakan nama saat ini
-                email: user.email,       // Tetap gunakan email saat ini
-                number: user.number,     // Tetap gunakan nomor saat ini
-                address: user.address,   // Tetap gunakan alamat saat ini
-                role: user.role,         // Tetap gunakan role saat ini
-                status: user.status      // Tetap gunakan status saat ini
+                name: user.name,         
+                email: user.email,       
+                number: user.number,    
+                address: user.address,   
+                role: user.role,         
+                status: user.status      
             });
     
             res.json({ message: 'Profile image deleted successfully' });

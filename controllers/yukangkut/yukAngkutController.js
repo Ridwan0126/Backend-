@@ -1,6 +1,6 @@
 const YukAngkut = require('../../models/yukangkut/YukAngkut');
 const generatePickupId = require('../../helpers/generatePickupID');
-const db = require('../../config/db'); // Import koneksi database
+const db = require('../../config/db'); 
 
 exports.getAllYukAngkut = async (req, res) => {
     try {
@@ -15,7 +15,7 @@ exports.getAllYukAngkut = async (req, res) => {
 exports.createYukAngkut = async (req, res) => {
     try {
         const { name, location, date, time, type, amount, photo, status, driver } = req.body;
-        const pickup_id = await generatePickupId(); // Generate pickup_id otomatis
+        const pickup_id = await generatePickupId(); 
 
         const result = await YukAngkut.create({
             pickup_id,
@@ -67,18 +67,15 @@ exports.updateYukAngkut = async (req, res) => {
     const { date, ...updatedData } = req.body;
 
     try {
-        // Validasi jika data tidak ditemukan
         const [existingData] = await db.query('SELECT * FROM yuk_angkut WHERE pickup_id = ?', [pickup_id]);
         if (existingData.length === 0) {
             return res.status(404).json({ message: 'Data not found' });
         }
 
-        // Konversi format tanggal ke 'YYYY-MM-DD'
-        const formattedDate = date ? new Date(date).toISOString().split('T')[0] : null; // Null jika tidak ada tanggal
-
+        const formattedDate = date ? new Date(date).toISOString().split('T')[0] : null; 
         const result = await YukAngkut.updateByPickupId(pickup_id, {
             ...updatedData,
-            date: formattedDate // Gunakan tanggal yang sudah diformat
+            date: formattedDate 
         });
 
         if (result.affectedRows > 0) {

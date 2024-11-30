@@ -13,15 +13,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/uploads/profile_pictures', express.static(path.join(__dirname, 'uploads/profile_pictures')));
+app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes); 
 app.use('/api/point-exchange', pointExchangeRoutes);
 app.use('/api/yuk_buang', yukBuangRoutes);
 app.use('/api/yuk_angkut', yukAngkutRoutes);
-
-app.use('/uploads/profile_pictures', express.static(path.join(__dirname, 'uploads/profile_pictures')));
-app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
