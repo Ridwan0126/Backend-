@@ -2,7 +2,6 @@ const db = require('../../config/db');
 
 exports.getDashboardData = async (req, res) => {
     try {
-        // Query Total Daur Ulang (Yuk Angkut dan Yuk Buang)
         const [totalDaurUlang] = await db.query(`
         SELECT 
             SUM(amount) AS total_daur_ulang 
@@ -13,32 +12,40 @@ exports.getDashboardData = async (req, res) => {
         WHERE status = 'Berhasil'
         `);
 
-        // Query Total Penjemputan (Yuk Buang dengan status "Penjemputan")
         const [totalPenjemputan] = await db.query(`
             SELECT COUNT(*) AS total_penjemputan 
             FROM yuk_angkut 
             WHERE status = 'Berhasil'
         `);
 
-        // Query Total Pengantaran (Yuk Buang dengan status "Pengantaran")
         const [totalPengantaran] = await db.query(`
             SELECT COUNT(*) AS total_pengantaran 
             FROM yuk_buang 
             WHERE status = 'Berhasil'
         `);
 
-        // Query Total Pengguna (Users dengan role bukan "Admin")
         const [totalPengguna] = await db.query(`
-            SELECT COUNT(*) AS total_pengguna 
-            FROM users 
-            WHERE role != 'Admin'
+          SELECT COUNT(DISTINCT pengguna_id) AS total_pengguna
+          FROM (
+              SELECT pickup_id AS pengguna_id
+              FROM yuk_angkut 
+              WHERE status = 'Berhasil'
+              UNION
+              SELECT delivery_id AS pengguna_id
+              FROM yuk_buang 
+              WHERE status = 'Berhasil'
+              UNION
+              SELECT id AS pengguna_id
+              FROM penukaran_poin 
+              WHERE status = 'Berhasil' 
+          ) AS pengguna
         `);
+        
 
-        // Query Overview (Akumulasi Daur Ulang Per Bulan)
         const [overview] = await db.query(`
         SELECT 
-            DATE_FORMAT(date, '%b') AS month,  -- Format '%b' menampilkan nama bulan singkat (Jan, Feb, dst)
-            SUM(amount) AS total_per_month 
+            DATE_FORMAT(date, '%b') AS month,  
+            SUM(CAST(amount AS DECIMAL)) AS total_per_month 
         FROM 
             (SELECT date, amount, status FROM yuk_angkut 
             UNION ALL 
@@ -46,10 +53,47 @@ exports.getDashboardData = async (req, res) => {
         WHERE 
             status = 'Berhasil'
         GROUP BY 
-            DATE_FORMAT(date, '%b'), MONTH(date)  -- Gunakan MONTH(date) untuk menjaga urutan bulan
+            DATE_FORMAT(date, '%b'), MONTH(date) 
         ORDER BY 
             MONTH(date);  -- Pastikan urutan bulan benar (Jan - Dec)
         `);
+
+        const [transactions] = await db.query(`
+          SELECT 
+              transaction_id,
+              name,
+              email,
+              type,
+              amount,
+              (CAST(amount AS DECIMAL) * price_per_kg) AS total_harga, 
+              date
+          FROM (
+              SELECT 
+                  pickup_id AS transaction_id,
+                  name,
+                  email,
+                  'Penjemputan' AS type,
+                  amount,
+                  price_per_kg,
+                  date
+              FROM yuk_angkut
+              WHERE status = 'Berhasil'
+              UNION ALL
+              SELECT 
+                  delivery_id AS transaction_id,
+                  name,
+                  email,
+                  'Pengantaran' AS type,
+                  amount,
+                  price_per_kg,
+                  date
+              FROM yuk_buang
+              WHERE status = 'Berhasil'
+          ) AS combined
+          ORDER BY date DESC
+          LIMIT 5
+      `);
+      
 
         // Kirim data ke frontend
         res.status(200).json({
@@ -58,6 +102,7 @@ exports.getDashboardData = async (req, res) => {
             totalPengantaran: totalPengantaran[0]?.total_pengantaran || 0,
             totalPengguna: totalPengguna[0]?.total_pengguna || 0,
             overview,
+            transactions,
         });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);

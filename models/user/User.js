@@ -34,21 +34,19 @@ const User = {
 
     updateById: async (id, data) => {
         try {
-            // Destructure with conditional defaults for role and status
             const {
                 name,
                 email,
                 number,
                 address,
-                role = data.role ? data.role : 'Admin', // Only set default if not provided
-                status = data.status ? data.status : 'Aktif', // Adjust to DB enum value
+                role = data.role ? data.role : 'Admin', 
+                status = data.status ? data.status : 'Aktif', 
                 profile_image
             } = data;
 
             const fields = ['name = ?', 'email = ?', 'number = ?', 'address = ?', 'role = ?', 'status = ?', 'profile_image = ?'];
             const values = [name, email, number, address, role, status, profile_image];
 
-            // Only include gender if provided
             if (data.gender !== undefined) { 
                 fields.push('gender = ?');
                 values.push(data.gender);

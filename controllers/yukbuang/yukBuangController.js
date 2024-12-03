@@ -14,7 +14,7 @@ exports.getAllYukBuang = async (req, res) => {
 
 exports.createYukBuang = async (req, res) => {
     try {
-        const { name, location, date, time, type, amount, photo, status } = req.body;
+        const { name, location, date, time, type, amount, photo, status,transaction_type, price_per_kg, email } = req.body;
         const delivery_id = await generateDeliveryId();
 
         const result = await YukBuang.create({
@@ -26,7 +26,10 @@ exports.createYukBuang = async (req, res) => {
             type,
             amount,
             photo,
-            status
+            status,
+            transaction_type, 
+            price_per_kg, 
+            email
         });
 
         if (result.affectedRows > 0) {

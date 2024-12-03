@@ -7,10 +7,10 @@ const YukAngkut = {
     },
 
     create: async (data) => {
-        const { pickup_id, name, location, date, time, type, amount, photo, status, driver } = data;
+        const { pickup_id, name, location, date, time, type, amount, photo, status, driver, transaction_type, price_per_kg } = data;
         const [result] = await db.query(
-            'INSERT INTO yuk_angkut (pickup_id, name, location, date, time, type, amount, photo, status, driver) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [pickup_id, name, location, date, time, type, amount, photo, status, driver]
+            'INSERT INTO yuk_angkut (pickup_id, name, location, date, time, type, amount, photo, status, driver, transaction_type, price_per_kg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [pickup_id, name, location, date, time, type, amount, photo, status, driver, transaction_type, price_per_kg]
         );
         return result;
     },

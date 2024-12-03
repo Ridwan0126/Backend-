@@ -14,7 +14,7 @@ exports.getAllYukAngkut = async (req, res) => {
 
 exports.createYukAngkut = async (req, res) => {
     try {
-        const { name, location, date, time, type, amount, photo, status, driver } = req.body;
+        const { name, location, date, time, type, amount, photo, status, driver, transaction_type, price_per_kg, email} = req.body;
         const pickup_id = await generatePickupId(); 
 
         const result = await YukAngkut.create({
@@ -28,6 +28,9 @@ exports.createYukAngkut = async (req, res) => {
             photo,
             status,
             driver,
+            transaction_type, 
+            price_per_kg, 
+            email
         });
 
         if (result.affectedRows > 0) {
