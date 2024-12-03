@@ -6,17 +6,18 @@ const userRoutes = require('./routes/user/userRoutes');
 const pointExchangeRoutes = require('./routes/kuypoint/pointExchangeRoutes');
 const yukBuangRoutes = require('./routes/yukbuang/yukBuangRoutes');
 const yukAngkutRoutes = require('./routes/yukangkut/yukAngkutRoutes');
+const dashboardRoutes = require('./routes/dashboard/dashboardRoutes');
 const db = require('./config/db');
 const path = require('path');
-
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
 app.use('/uploads/profile_pictures', express.static(path.join(__dirname, 'uploads/profile_pictures')));
 app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
 
-// Routes
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes); 
 app.use('/api/point-exchange', pointExchangeRoutes);
