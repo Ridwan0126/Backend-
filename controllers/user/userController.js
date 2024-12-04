@@ -103,14 +103,14 @@ const userController = {
             }
 
             if (user.profile_image && user.profile_image !== '/Avatar.svg') {
-                const imagePath = path.join(__dirname, '..', user.profile_image);
+                const imagePath = path.resolve(__dirname, '..', user.profile_image);
                 fs.unlink(imagePath, (err) => {
                     if (err) {
                         console.error('Failed to delete image file:', err);
                     }
                 });
             }
-    
+
             const result = await User.updateById(req.userId, {
                 profile_image: null,
                 name: user.name,         
@@ -120,7 +120,7 @@ const userController = {
                 role: user.role,         
                 status: user.status      
             });
-    
+
             res.json({ message: 'Profile image deleted successfully' });
         } catch (error) {
             console.error('Error deleting profile image:', error);
@@ -128,55 +128,65 @@ const userController = {
         }
     },    
 
-    getAdmins: async (req, res) => {
+    getUsers: async (req, res) => {
         try {
-            const admins = await User.findByRole('Admin');
-            res.json(admins);
+            const role = req.query.role; // Ambil role dari query string
+    
+            let users;
+            if (role) {
+                // Jika ada query role, ambil pengguna berdasarkan role tersebut
+                users = await User.findByRole(role);
+            } else {
+                // Jika tidak ada query role, ambil semua pengguna (baik Admin maupun User)
+                users = await User.findAll();  // Memanggil method findAll untuk mengambil semua data pengguna
+            }
+    
+            res.json(users); // Kirimkan data pengguna
         } catch (error) {
-            console.error('Error fetching admins:', error);
+            console.error('Error fetching users:', error);
             res.status(500).json({ message: 'Server error' });
         }
-    },
+    },    
 
-    addAdmin: async (req, res) => {
+    addUsers: async (req, res) => {
         try {
             const { name, email, number, address, role, status } = req.body;
-            const newAdmin = { name, email, number, address, role, status };
-            const result = await User.create(newAdmin);
+            const newUser = { name, email, number, address, role, status };
+            const result = await User.create(newUser);
             res.status(201).json(result);
         } catch (error) {
-            console.error('Error adding admin:', error);
+            console.error('Error adding user:', error);
             res.status(500).json({ message: 'Server error' });
         }
     },
 
-    deleteAdmin: async (req, res) => {
+    deleteUsers: async (req, res) => {
         try {
             const { id } = req.params;
             const result = await User.deleteById(id);
             if (result.affectedRows > 0) {
-                res.json({ message: 'Admin berhasil dihapus' });
+                res.json({ message: 'User berhasil dihapus' });
             } else {
-                res.status(404).json({ message: 'Admin tidak ditemukan' });
+                res.status(404).json({ message: 'User tidak ditemukan' });
             }
         } catch (error) {
-            console.error('Error deleting admin:', error);
+            console.error('Error deleting user:', error);
             res.status(500).json({ message: 'Server error' });
         }
     },
 
-    updateAdmin: async (req, res) => {
+    updateUsers: async (req, res) => {
         try {
             const { id } = req.params;
             const { name, email, number, address, role, status } = req.body;
             const result = await User.updateById(id, { name, email, number, address, role, status });
             if (result.affectedRows > 0) {
-                res.json({ message: 'Admin updated successfully' });
+                res.json({ message: 'User updated successfully' });
             } else {
-                res.status(404).json({ message: 'Admin not found' });
+                res.status(404).json({ message: 'User not found' });
             }
         } catch (error) {
-            console.error('Error updating admin:', error);
+            console.error('Error updating user:', error);
             res.status(500).json({ message: 'Server error' });
         }
     }

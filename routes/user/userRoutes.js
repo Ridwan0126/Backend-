@@ -8,9 +8,9 @@ router.get('/profile', authMiddleware, userController.getProfile);
 router.put('/profile', authMiddleware, userController.updateProfile);
 router.put('/profile/upload', authMiddleware, uploadProfilePicture.single('profileImage'), userController.uploadProfileImage);
 router.delete('/profile/image', authMiddleware, userController.deleteProfileImage);
-router.get('/admins', authMiddleware, userController.getAdmins); 
-router.post('/admins', authMiddleware, userController.addAdmin); 
-router.delete('/admins/:id', userController.deleteAdmin);
-router.put('/admins/:id', authMiddleware, userController.updateAdmin);
+router.get('/users', authMiddleware, userController.getUsers); 
+router.post('/users', authMiddleware, userController.addUsers); 
+router.delete('/users/:id', userController.deleteUsers);
+router.put('/users/:id', authMiddleware, userController.updateUsers);
 
 module.exports = router;

@@ -1,6 +1,5 @@
 const db = require('../../config/db');
 
-
 const User = {
     findByEmail: async (email) => {
         try {
@@ -12,7 +11,6 @@ const User = {
         }
     },
     
-
     findById: async (id) => {
         try {
             const [results] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
@@ -32,6 +30,17 @@ const User = {
             throw error;
         }
     },
+
+    findAll: async () => {
+        try {
+            const [results] = await db.query('SELECT * FROM users');
+            return results;
+        } catch (error) {
+            console.error('Error fetching all users:', error);
+            throw error;
+        }
+    },
+
 
     updateById: async (id, data) => {
         try {
