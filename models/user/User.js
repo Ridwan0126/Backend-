@@ -4,13 +4,14 @@ const db = require('../../config/db');
 const User = {
     findByEmail: async (email) => {
         try {
-            const [results] = await db.query('SELECT * FROM users WHERE email = ? AND role = "Admin"', [email]);
+            const [results] = await db.query('SELECT * FROM users WHERE email = ?', [email]);  
             return results[0];
         } catch (error) {
             console.error('Error finding user by email:', error);
             throw error;
         }
     },
+    
 
     findById: async (id) => {
         try {
