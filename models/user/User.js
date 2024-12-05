@@ -74,10 +74,10 @@ const User = {
 
     create: async (userData) => {
         try {
-            const { name, email, number, address, role = 'Admin', status = 'Aktif', gender = 'Not Specified', profile_image = null } = userData;
+            const { name, email, password, number, address, role = 'User', status = 'Aktif', gender = 'Not Specified', profile_image = null, birthdate = null } = userData;
             const [result] = await db.query(
-                'INSERT INTO users (name, email, number, address, role, status, gender, profile_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [name, email, number, address, role, status, gender, profile_image]
+                'INSERT INTO users (name, email, password, number, address, role, status, gender, profile_image, birthdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [name, email, password, number, address, role, status, gender, profile_image, birthdate]
             );
             return { id: result.insertId, ...userData };
         } catch (error) {

@@ -23,24 +23,35 @@ exports.getDashboardData = async (req, res) => {
             FROM yuk_buang 
             WHERE status = 'Berhasil'
         `);
-
-        const [totalPengguna] = await db.query(`
-          SELECT COUNT(DISTINCT pengguna_id) AS total_pengguna
-          FROM (
-              SELECT pickup_id AS pengguna_id
-              FROM yuk_angkut 
-              WHERE status = 'Berhasil'
-              UNION
-              SELECT delivery_id AS pengguna_id
-              FROM yuk_buang 
-              WHERE status = 'Berhasil'
-              UNION
-              SELECT id AS pengguna_id
-              FROM penukaran_poin 
-              WHERE status = 'Berhasil' 
-          ) AS pengguna
-        `);
         
+        const [totalPengguna] = await db.query(`
+            SELECT COUNT(DISTINCT email) AS total_pengguna
+            FROM (
+                SELECT email
+                FROM yuk_angkut
+                WHERE status = 'Berhasil'
+                
+                UNION ALL
+                
+                SELECT email
+                FROM yuk_buang
+                WHERE status = 'Berhasil'
+                
+                UNION ALL
+                
+                SELECT email
+                FROM penukaran_poin
+                WHERE status = 'Berhasil'
+                
+                UNION ALL
+                
+                SELECT email
+                FROM users
+                WHERE role = 'User'
+            ) AS pengguna
+            WHERE email IS NOT NULL;
+            `);            
+            
 
         const [overview] = await db.query(`
         SELECT 
