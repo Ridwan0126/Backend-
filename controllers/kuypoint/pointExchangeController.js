@@ -19,7 +19,7 @@ const pointExchangeController = {
         try {
             const newData = req.body;
 
-            const newID = await generatePointID(); // Gunakan generatePointID
+            const newID = await generatePointID();
             const dataToInsert = {
                 id: newID,
                 ...newData
