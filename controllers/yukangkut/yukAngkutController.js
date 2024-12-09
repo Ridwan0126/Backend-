@@ -17,14 +17,12 @@ exports.getAllYukAngkut = async (req, res) => {
 
 exports.createYukAngkut = async (req, res) => {
   try {
-    // Ambil token dari header Authorization
     const token = req.headers.authorization?.split(' ')[1];
     
     if (!token) {
       return res.status(401).json({ message: 'Token not provided' });
     }
 
-    // Verifikasi token dan ambil senderId
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.SECRET_KEY);
@@ -32,11 +30,10 @@ exports.createYukAngkut = async (req, res) => {
       return res.status(401).json({ message: 'Invalid or expired token', error: err.message });
     }
     
-    const senderId = decoded.id; // pastikan id ada di payload token
+    const senderId = decoded.id; 
 
     const { name, location, date, time, type, amount, photo, status, driver, transaction_type, price_per_kg, email } = req.body;
 
-    // Validasi input
     if (!name || !location || !date || !time || !type || !amount || !photo || !status || !transaction_type || price_per_kg === undefined || !email) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -68,7 +65,6 @@ exports.createYukAngkut = async (req, res) => {
         return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' });
       }
 
-      // Insert message to database
       try {
         await db.query(
           'INSERT INTO messages (sender_id, recipient_id, message, pickup_id) VALUES (?, ?, ?, ?)',

@@ -8,6 +8,7 @@ const yukBuangRoutes = require('./routes/yukbuang/yukBuangRoutes');
 const yukAngkutRoutes = require('./routes/yukangkut/yukAngkutRoutes');
 const dashboardRoutes = require('./routes/dashboard/dashboardRoutes');
 const messageRoutes = require('./routes/message/messageRoutes');
+const notificationRoutes = require('./routes/notification/notifRoutes');
 const db = require('./config/db');
 const path = require('path');
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/point-exchange', pointExchangeRoutes);
 app.use('/api/yuk_buang', yukBuangRoutes);
 app.use('/api/yuk_angkut', yukAngkutRoutes);
 app.use('/api/message', messageRoutes);
+app.use('/api', notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

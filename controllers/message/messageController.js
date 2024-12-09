@@ -72,3 +72,29 @@ exports.updatePickupStatusAndNotify = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+exports.markAsRead = async (req, res) => {
+  const { messageId } = req.params;
+
+  console.log('Message ID:', messageId);  // Log to see the messageId coming in
+
+  if (!messageId) {
+    return res.status(400).json({ error: 'MessageId is required' });
+  }
+
+  try {
+    const [result] = await db.query(
+      'UPDATE messages SET status = ? WHERE id = ?',
+      ['read', messageId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+
+    return res.status(200).json({ message: 'Message marked as read' });
+  } catch (err) {
+    console.error('Error marking message as read:', err);
+    return res.status(500).json({ error: err.message });
+  }
+};
