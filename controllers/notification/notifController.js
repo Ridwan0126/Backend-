@@ -1,15 +1,13 @@
 const db = require('../../config/db'); 
 
-const getPendingRequests = (req, res) => {
+const getPendingRequests = async (req, res) => {
     const query = "SELECT COUNT(*) AS total_proses FROM yuk_angkut WHERE status = 'Proses'";
 
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error fetching pending requests:', err);
-            return res.status(500).json({ error: 'Failed to fetch pending requests' });
-        }
-
-        const totalProses = result[0].total_proses;
+    try {
+        // Use the promise-based query method
+        const [rows] = await db.execute(query);
+        
+        const totalProses = rows[0].total_proses;
         const notifications = [
             {
                 id: 1,
@@ -34,8 +32,11 @@ const getPendingRequests = (req, res) => {
             }
         ];
 
-        res.json(notifications);
-    });
+        res.status(200).json(notifications);
+    } catch (err) {
+        console.error('Error fetching pending requests:', err);
+        return res.status(500).json({ error: 'Failed to fetch pending requests' });
+    }
 };
 
 module.exports = { getPendingRequests };

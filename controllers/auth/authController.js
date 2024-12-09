@@ -5,10 +5,14 @@ const User = require('../../models/user/User');
 const authController = {
     register: async (req, res) => {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, confirmPassword } = req.body;
 
-            if (!name || !email || !password) {
-                return res.status(400).json({ message: 'Nama, email, dan password harus diisi' });
+            if (!name || !email || !password || !confirmPassword) {
+                return res.status(400).json({ message: 'Nama, email, password, dan konfirmasi password harus diisi' });
+            }
+
+            if (password !== confirmPassword) {
+                return res.status(400).json({ message: 'Password dan konfirmasi password tidak cocok' });
             }
 
             const existingUser = await User.findByEmail(email);
@@ -22,17 +26,17 @@ const authController = {
             const newUser = {
                 name,
                 email,
-                password: hashedPassword, 
-                number: null, 
-                address: null, 
-                gender: 'Laki-laki', 
-                role: 'User', 
-                status: 'aktif', 
+                password: hashedPassword,
+                number: null,
+                address: null,
+                gender: 'Laki-laki',
+                role: 'User',
+                status: 'aktif',
                 profile_image: null,
                 birthdate: null,
             };
 
-            console.log('New User Data:', newUser); 
+            console.log('New User Data:', newUser);
 
             await User.create(newUser);
 
@@ -42,6 +46,8 @@ const authController = {
             res.status(500).json({ message: 'Server error' });
         }
     },
+
+
 
     login: async (req, res) => {
         const { email, password } = req.body;
