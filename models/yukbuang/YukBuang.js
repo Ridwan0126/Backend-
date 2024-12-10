@@ -7,13 +7,13 @@ const YukBuang = {
     },
 
     create: async (data) => {
-        const { delivery_id, name, location, date, time, type, amount, photo, status } = data;
+        const { delivery_id, name, location, date, time, type, amount, photo, status, email } = data; // Tambahkan email
         const [result] = await db.query(
-            'INSERT INTO yuk_buang (delivery_id, name, location, date, time, type, amount, photo, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [delivery_id, name, location, date, time, type, amount, photo, status]
+            'INSERT INTO yuk_buang (delivery_id, name, location, date, time, type, amount, photo, status, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [delivery_id, name, location, date, time, type, amount, photo, status, email] // Masukkan email ke query
         );
         return result;
-    },
+    },    
 
     deleteByDeliveryId: async (delivery_id) => {
         const [result] = await db.query('DELETE FROM yuk_buang WHERE delivery_id = ?', [delivery_id]);

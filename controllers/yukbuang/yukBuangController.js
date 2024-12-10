@@ -1,6 +1,8 @@
 const YukBuang = require('../../models/yukbuang/YukBuang');
 const generateDeliveryId = require('../../helpers/generateDeliveryID');
-const db = require('../../config/db'); 
+const db = require('../../config/db');
+const jwt = require('jsonwebtoken'); 
+require('dotenv').config();
 
 exports.getAllYukBuang = async (req, res) => {
     try {
@@ -14,9 +16,37 @@ exports.getAllYukBuang = async (req, res) => {
 
 exports.createYukBuang = async (req, res) => {
     try {
-        const { name, location, date, time, type, amount, photo, status,transaction_type, price_per_kg, email } = req.body;
-        const delivery_id = await generateDeliveryId();
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ message: 'Token not provided' });
+        }
 
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY); // Verifikasi token
+        } catch (err) {
+            return res.status(401).json({ message: 'Invalid or expired token', error: err.message });
+        }
+
+        const email = decoded.email; // Ambil email dari token
+
+        const photoPaths = req.files ? req.files.map(file => 'uploads/yukbuang/' + file.filename) : [];
+
+        if (photoPaths.length === 0) {
+            return res.status(400).json({ message: 'At least one photo must be uploaded' });
+        }
+
+        if (photoPaths.length > 2) {
+            return res.status(400).json({ message: 'You can only upload up to 2 photos' });
+        }
+
+        const { name, location, date, time, type, amount, status, transaction_type, price_per_kg } = req.body;
+
+        const transactionType = transaction_type || 'Pengantaran';
+        const delivery_id = await generateDeliveryId();
+        const pricePerKg = (price_per_kg === undefined || price_per_kg === '' || price_per_kg === 'null') ? null : parseFloat(price_per_kg);
+
+        // Masukkan data ke database, termasuk email
         const result = await YukBuang.create({
             delivery_id,
             name,
@@ -25,18 +55,18 @@ exports.createYukBuang = async (req, res) => {
             time,
             type,
             amount,
-            photo,
+            photo: photoPaths,
             status,
-            transaction_type, 
-            price_per_kg, 
-            email
+            transaction_type: transactionType,
+            price_per_kg: pricePerKg,
+            email, // Sertakan email
         });
 
         if (result.affectedRows > 0) {
             res.status(201).json({
                 message: 'Yuk Buang created successfully',
                 id: result.insertId,
-                delivery_id
+                delivery_id,
             });
         } else {
             res.status(400).json({ message: 'Failed to create Yuk Buang' });
@@ -46,6 +76,7 @@ exports.createYukBuang = async (req, res) => {
         res.status(500).json({ message: 'Error creating data', error: error.message });
     }
 };
+
 
 exports.deleteYukBuang = async (req, res) => {
     try {

@@ -31,16 +31,29 @@ exports.createYukAngkut = async (req, res) => {
     }
     
     const senderId = decoded.id; 
+    const email = decoded.email; 
 
-    const { name, location, date, time, type, amount, photo, status, driver, transaction_type, price_per_kg, email } = req.body;
+    const photoPaths = req.files?.map(file => 'uploads/yukangkut/' + file.filename) || [];
 
-    if (!name || !location || !date || !time || !type || !amount || !photo || !status || !transaction_type || price_per_kg === undefined || !email) {
+    if (photoPaths.length === 0) {
+      return res.status(400).json({ message: 'At least one photo must be uploaded' });
+    }
+    
+    if (photoPaths.length > 2) {
+      return res.status(400).json({ message: 'You can only upload up to 2 photos' });
+    }
+
+    const { name, location, date, time, type, amount, status, driver, transaction_type, price_per_kg} = req.body;
+    const transactionType = transaction_type || 'Penjemputan'; 
+    
+    if (!name || !location || !date || !time || !type || !amount || !status || price_per_kg === undefined || !email) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
     const pickup_id = await generatePickupId();
+     const pricePerKg = (price_per_kg === undefined || price_per_kg === '' || price_per_kg === 'null') ? null : parseFloat(price_per_kg);
+    
 
-    // Buat Yuk Angkut
     const result = await YukAngkut.create({
       pickup_id,
       name,
@@ -49,11 +62,11 @@ exports.createYukAngkut = async (req, res) => {
       time,
       type,
       amount,
-      photo,
+      photo: photoPaths.join(','), 
       status,
       driver,
-      transaction_type,
-      price_per_kg,
+      transaction_type: transactionType, 
+      price_per_kg: pricePerKg,
       email,
     });
 
