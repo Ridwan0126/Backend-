@@ -23,12 +23,12 @@ exports.createYukBuang = async (req, res) => {
 
         let decoded;
         try {
-            decoded = jwt.verify(token, process.env.SECRET_KEY); // Verifikasi token
+            decoded = jwt.verify(token, process.env.SECRET_KEY); 
         } catch (err) {
             return res.status(401).json({ message: 'Invalid or expired token', error: err.message });
         }
 
-        const email = decoded.email; // Ambil email dari token
+        const email = decoded.email; 
 
         const photoPaths = req.files ? req.files.map(file => 'uploads/yukbuang/' + file.filename) : [];
 
@@ -46,7 +46,6 @@ exports.createYukBuang = async (req, res) => {
         const delivery_id = await generateDeliveryId();
         const pricePerKg = (price_per_kg === undefined || price_per_kg === '' || price_per_kg === 'null') ? null : parseFloat(price_per_kg);
 
-        // Masukkan data ke database, termasuk email
         const result = await YukBuang.create({
             delivery_id,
             name,
@@ -59,7 +58,7 @@ exports.createYukBuang = async (req, res) => {
             status,
             transaction_type: transactionType,
             price_per_kg: pricePerKg,
-            email, // Sertakan email
+            email, 
         });
 
         if (result.affectedRows > 0) {
