@@ -4,7 +4,6 @@ const getPendingRequests = async (req, res) => {
     const query = "SELECT COUNT(*) AS total_proses FROM yuk_angkut WHERE status = 'Proses'";
 
     try {
-        // Use the promise-based query method
         const [rows] = await db.execute(query);
         
         const totalProses = rows[0].total_proses;

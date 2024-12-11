@@ -1,17 +1,16 @@
 const Blog = require('../../models/blog/Blog');
 const db = require('../../config/db');
 
-// Get all blogs
 exports.getAllBlogs = async (req, res) => {
     try {
-      const blogs = await Blog.getAllBlogs();  // Tidak perlu limit dan offset lagi
+      const blogs = await Blog.getAllBlogs();  
       res.status(200).json(blogs);
     } catch (err) {
       console.error('Error fetching blogs:', err);
       res.status(500).json({ message: 'Terjadi kesalahan saat mengambil blog', error: err });
     }
   };
-// Get a blog by ID
+
 exports.getBlogById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -26,11 +25,10 @@ exports.getBlogById = async (req, res) => {
   }
 };
 
-// Create a new blog
 exports.createBlog = async (req, res) => {
   const { judul, isiBlog, penulis, tanggalPublikasi, banner, status } = req.body;
 
-  // Validate required fields
+
   if (!judul || !isiBlog || !penulis || !tanggalPublikasi || !banner || !status) {
     return res.status(400).json({ message: 'All fields are required' });
   }
@@ -77,33 +75,20 @@ exports.updateBlog = async (req, res) => {
   }
 };
 
-exports.updateBlogStatus = async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  // Validate status
-  if (!status) {
-    return res.status(400).json({ message: 'Status is required' });
-  }
-
-  const validStatuses = ['Dipublikasikan', 'Draft']; // Modify with the actual valid statuses
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ message: 'Invalid status value' });
-  }
-
-  try {
-    const updatedBlog = await Blog.updateStatus(id, status);
-    if (!updatedBlog) {
-      return res.status(404).json({ message: 'Blog not found' });
+exports.getPublishedBlogs = async (req, res) => {
+    try {
+      const blogs = await Blog.getPublishedBlogs();
+      if (blogs.length === 0) {
+        console.log('No blogs found'); // Log untuk debugging
+        return res.status(404).json({ message: 'Blog not found' });
+      }
+      res.status(200).json(blogs);
+    } catch (err) {
+      console.error('Error fetching published blogs:', err);
+      res.status(500).json({ message: 'Terjadi kesalahan saat mengambil blog', error: err });
     }
-    res.status(200).json(updatedBlog);
-  } catch (err) {
-    console.error('Error updating blog status:', err);
-    res.status(500).json({ message: 'Error updating blog status', error: err });
-  }
-};
+  };
 
-// In your blogController.js
 exports.uploadBlogImage = async (req, res) => {
     const { id } = req.params;
   
@@ -115,7 +100,6 @@ exports.uploadBlogImage = async (req, res) => {
   
     try {
       if (id) {
-        // If there's an ID, update the image for an existing blog
         const result = await Blog.updateBlogImageById(id, { image: fileUrl });
   
         if (result.affectedRows > 0) {
@@ -124,7 +108,6 @@ exports.uploadBlogImage = async (req, res) => {
           res.status(404).json({ message: 'Blog not found' });
         }
       } else {
-        // If there's no ID (i.e., creating a new blog), return the image URL without saving to a blog
         res.json({ message: 'Image uploaded successfully', imageUrl: fileUrl });
       }
     } catch (error) {

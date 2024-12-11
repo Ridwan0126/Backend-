@@ -1,9 +1,8 @@
 const db = require('../../config/db');
 
 const Blog = {
-  // Mendapatkan semua blog tanpa limit dan offset
   getAllBlogs: async () => {
-    const query = 'SELECT * FROM blogs';  // Tanpa LIMIT dan OFFSET
+    const query = 'SELECT * FROM blogs';  
     try {
       const [results] = await db.execute(query);
       return results;
@@ -12,13 +11,12 @@ const Blog = {
     }
   },
 
-  // Get a blog by ID
   getBlogById: async (id) => {
     const query = 'SELECT * FROM blogs WHERE id = ?';
     try {
       const [results] = await db.execute(query, [id]);
       if (results.length === 0) {
-        return null; // Handle not found
+        return null; 
       }
       return results[0];
     } catch (err) {
@@ -26,7 +24,6 @@ const Blog = {
     }
   },
 
-  // Create a new blog
   createBlog: async (blogData) => {
     const { judul, isiBlog, penulis, tanggalPublikasi, banner, status } = blogData;
     const query = 'INSERT INTO blogs (judul, isiBlog, penulis, tanggalPublikasi, banner, status) VALUES (?, ?, ?, ?, ?, ?)';
@@ -38,14 +35,13 @@ const Blog = {
     }
   },
 
-  // Update an existing blog
   updateBlog: async (id, blogData) => {
     const { judul, isiBlog, penulis, tanggalPublikasi, banner, status } = blogData;
     const query = 'UPDATE blogs SET judul = ?, isiBlog = ?, penulis = ?, tanggalPublikasi = ?, banner = ?, status = ? WHERE id = ?';
     try {
       const [results] = await db.execute(query, [judul, isiBlog, penulis, tanggalPublikasi, banner, status, id]);
       if (results.affectedRows === 0) {
-        return null; // No rows were updated, handle not found
+        return null; 
       }
       return { id, ...blogData };
     } catch (err) {
@@ -53,49 +49,30 @@ const Blog = {
     }
   },
 
-  // Update an existing blog by ID (allowing partial update)
 updateBlogById: async (id, blogData) => {
     const { judul, isiBlog, penulis, tanggalPublikasi, banner, status } = blogData;
   
-    // Menyiapkan query untuk update hanya kolom yang diterima
     const query = 'UPDATE blogs SET judul = ?, isiBlog = ?, penulis = ?, tanggalPublikasi = ?, banner = ?, status = ? WHERE id = ?';
     
     try {
       const [results] = await db.execute(query, [judul, isiBlog, penulis, tanggalPublikasi, banner, status, id]);
   
-      // Memeriksa jika tidak ada baris yang di-update
       if (results.affectedRows === 0) {
-        return null; // Jika tidak ada perubahan, blog dengan ID tidak ditemukan
+        return null; 
       }
   
-      return { id, ...blogData };  // Kembalikan data blog yang di-update
+      return { id, ...blogData }; 
     } catch (err) {
-      throw err;  // Tangani error jika terjadi kesalahan dalam eksekusi query
+      throw err; 
     }
   },  
-  
 
-  // Update the status of a blog
-  updateStatus: async (id, status) => {
-    const query = 'UPDATE blogs SET status = ? WHERE id = ?';
-    try {
-      const [results] = await db.execute(query, [status, id]);
-      if (results.affectedRows === 0) {
-        return null; // No rows were updated, handle not found
-      }
-      return { id, status };
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  // Delete a blog
   deleteBlog: async (id) => {
     const query = 'DELETE FROM blogs WHERE id = ?';
     try {
       const [results] = await db.execute(query, [id]);
       if (results.affectedRows === 0) {
-        return null; // Handle not found
+        return null; 
       }
       return { message: 'Blog deleted successfully' };
     } catch (err) {
@@ -103,19 +80,31 @@ updateBlogById: async (id, blogData) => {
     }
   },
 
-  // Update the banner image of a blog
   updateBlogBannerById: async (id, { banner }) => {
     const query = 'UPDATE blogs SET banner = ? WHERE id = ?';
     try {
       const [results] = await db.execute(query, [banner, id]);
       if (results.affectedRows === 0) {
-        return null; // No rows were updated, handle not found
+        return null; 
       }
       return { id, banner };
     } catch (err) {
       throw err;
     }
-  }
+  },
+
+  getPublishedBlogs: async () => {
+    try {
+      const [rows] = await db.execute(
+        'SELECT * FROM blogs WHERE status = ?',
+        ['Dipublikasikan']
+      ); 
+      return rows;
+    } catch (err) {
+      console.error('Error fetching blogs from database:', err);
+      throw err;
+    }
+  },
 };
 
 module.exports = Blog;
