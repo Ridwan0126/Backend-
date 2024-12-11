@@ -38,12 +38,14 @@ const upload = (folderName) => {
 
 const uploadProfilePicture = upload('profile_pictures');
 const uploadReceipt = upload('receipts');
+const uploadBlogImage = upload('blog');
 const uploadYukAngkutPhoto = upload('yukangkut').array('photo', 2); 
 const uploadYukBuangPhoto = upload('yukbuang').array('photo', 2);
 
 module.exports = { 
     uploadProfilePicture, 
     uploadReceipt, 
+    uploadBlogImage,
     uploadYukAngkutPhoto, 
-    uploadYukBuangPhoto 
+    uploadYukBuangPhoto
 };

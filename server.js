@@ -9,6 +9,7 @@ const yukAngkutRoutes = require('./routes/yukangkut/yukAngkutRoutes');
 const dashboardRoutes = require('./routes/dashboard/dashboardRoutes');
 const messageRoutes = require('./routes/message/messageRoutes');
 const notificationRoutes = require('./routes/notification/notifRoutes');
+const blogRoutes = require('./routes/blog/blogRoutes');
 const db = require('./config/db');
 const path = require('path');
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use('/uploads/profile_pictures', express.static(path.join(__dirname, 'uploads/profile_pictures')));
 app.use('/uploads/receipts', express.static(path.join(__dirname, 'uploads/receipts')));
+app.use('/uploads/blog', express.static(path.join(__dirname, 'uploads/blog')));
 
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
@@ -27,6 +29,7 @@ app.use('/api/yuk_buang', yukBuangRoutes);
 app.use('/api/yuk_angkut', yukAngkutRoutes);
 app.use('/api/message', messageRoutes);
 app.use('/api', notificationRoutes);
+app.use('/api/blogs', blogRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
