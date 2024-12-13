@@ -43,6 +43,7 @@ exports.createYukBuang = async (req, res) => {
         const { name, location, date, time, type, amount, status, transaction_type, price_per_kg } = req.body;
 
         const transactionType = transaction_type || 'Pengantaran';
+        const statusValue = status || 'Proses';
         const delivery_id = await generateDeliveryId();
         const pricePerKg = (price_per_kg === undefined || price_per_kg === '' || price_per_kg === 'null') ? null : parseFloat(price_per_kg);
 
@@ -55,7 +56,7 @@ exports.createYukBuang = async (req, res) => {
             type,
             amount,
             photo: photoPaths,
-            status,
+            status: statusValue,
             transaction_type: transactionType,
             price_per_kg: pricePerKg,
             email, 

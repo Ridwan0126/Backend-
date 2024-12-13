@@ -45,8 +45,9 @@ exports.createYukAngkut = async (req, res) => {
 
     const { name, location, date, time, type, amount, status, driver, transaction_type, price_per_kg} = req.body;
     const transactionType = transaction_type || 'Penjemputan'; 
+    const statusValue = status || 'Proses';
     
-    if (!name || !location || !date || !time || !type || !amount || !status || price_per_kg === undefined || !email) {
+    if (!name || !location || !date || !time || !type || !amount || price_per_kg === undefined || !email) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
@@ -63,7 +64,7 @@ exports.createYukAngkut = async (req, res) => {
       type,
       amount,
       photo: photoPaths.join(','), 
-      status,
+      status: statusValue,
       driver,
       transaction_type: transactionType, 
       price_per_kg: pricePerKg,
